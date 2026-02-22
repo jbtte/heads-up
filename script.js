@@ -179,9 +179,13 @@ function nextWord() {
 // --- Movimento ---
 
 function handleMotion(event) {
-  if (isProcessing) return;
   const tilt = event.beta;
   if (tilt === null) return;
+
+  const dbg = document.getElementById('debug-overlay');
+  if (dbg) dbg.textContent = `β: ${tilt.toFixed(1)}°`;
+
+  if (isProcessing) return;
 
   if (tilt < 20) {
     isProcessing = true;
