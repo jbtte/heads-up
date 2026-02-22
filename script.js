@@ -172,6 +172,7 @@ function nextWord() {
     return;
   }
   document.getElementById('word-card').innerText = wordsQueue.pop();
+  referenceBeta = null;
   isProcessing = false;
 }
 
