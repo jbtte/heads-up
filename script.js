@@ -7,6 +7,7 @@ let timeLeft = 60;
 let gameTimer;
 let isProcessing = false;
 let audioCtx = null;
+let referenceBeta = null;
 
 // --- Áudio ---
 
@@ -161,6 +162,7 @@ function startGame() {
     if (timeLeft <= 0) endGame();
   }, 1000);
 
+  referenceBeta = null;
   window.addEventListener('deviceorientation', handleMotion);
 }
 
@@ -178,10 +180,19 @@ function nextWord() {
 function handleMotion(event) {
   if (isProcessing) return;
   const tilt = event.beta;
-  if (tilt > 45) {
+  if (tilt === null) return;
+
+  if (referenceBeta === null) {
+    referenceBeta = tilt;
+    return;
+  }
+
+  const delta = tilt - referenceBeta;
+
+  if (delta > 40) {
     isProcessing = true;
     processPoint('correct');
-  } else if (tilt < -45) {
+  } else if (delta < -40) {
     isProcessing = true;
     processPoint('passed');
   }
