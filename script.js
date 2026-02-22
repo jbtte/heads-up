@@ -7,7 +7,6 @@ let timeLeft = 60;
 let gameTimer;
 let isProcessing = false;
 let audioCtx = null;
-let referenceBeta = null;
 
 // --- Áudio ---
 
@@ -165,7 +164,6 @@ function startGame() {
   if (screen.orientation && screen.orientation.lock) {
     screen.orientation.lock('landscape-primary').catch(() => {});
   }
-  referenceBeta = null;
   window.addEventListener('deviceorientation', handleMotion);
 }
 
@@ -175,7 +173,6 @@ function nextWord() {
     return;
   }
   document.getElementById('word-card').innerText = wordsQueue.pop();
-  referenceBeta = null;
   isProcessing = false;
 }
 
@@ -186,19 +183,10 @@ function handleMotion(event) {
   const tilt = event.beta;
   if (tilt === null) return;
 
-  if (referenceBeta === null) {
-    referenceBeta = tilt;
-    return;
-  }
-
-  let delta = tilt - referenceBeta;
-  if (delta > 180) delta -= 360;
-  if (delta < -180) delta += 360;
-
-  if (delta < -40) {
+  if (tilt < 20) {
     isProcessing = true;
     processPoint('correct');
-  } else if (delta > 40) {
+  } else if (tilt > 160) {
     isProcessing = true;
     processPoint('passed');
   }

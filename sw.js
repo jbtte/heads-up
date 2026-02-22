@@ -1,4 +1,4 @@
-const CACHE_NAME = 'heads-up-v7';
+const CACHE_NAME = 'heads-up-v8';
 
 const ASSETS = [
   './',
