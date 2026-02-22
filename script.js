@@ -8,11 +8,11 @@ let gameTimer;
 let audioCtx = null;
 
 // --- Detecção de movimento ---
-const LIMITE_ACAO    = 40;
-const ZONA_NEUTRA    = 70;  // gamma acima disso = celular na posição inicial
+const ZONA_NEUTRA = 70;   // gamma acima disso = celular na posição inicial
+const ZONA_VERDE  = 45;   // gamma abaixo disso (e > 0) = acertou
+const ZONA_VERMELHA = -25; // gamma abaixo disso = passou
 
-let travado          = false;
-let anguloReferencia = null;
+let travado = false;
 
 // --- Áudio ---
 
@@ -168,7 +168,6 @@ function startGame() {
   }, 1000);
 
   travado = false;
-  anguloReferencia = null;
 
   if (screen.orientation && screen.orientation.lock) {
     screen.orientation.lock('landscape-primary').catch(() => {});
@@ -186,28 +185,12 @@ function nextWord() {
 
 // --- Movimento ---
 
-function calcularDelta(atual, referencia) {
-  let delta = referencia - atual;
-  if (delta >  90) delta -= 180;
-  if (delta < -90) delta += 180;
-  return delta;
-}
-
 function handleMotion(event) {
   const gamma = event.gamma;
   if (gamma === null) return;
 
   const dbg = document.getElementById('debug-overlay');
-  if (dbg) {
-    const d = anguloReferencia !== null ? calcularDelta(gamma, anguloReferencia).toFixed(1) : 'cal...';
-    dbg.textContent = `γ:${gamma.toFixed(1)}° Δ:${d}°`;
-  }
-
-  // Calibração: aguarda posição neutra (gamma claramente positivo)
-  if (anguloReferencia === null) {
-    if (gamma > ZONA_NEUTRA) anguloReferencia = gamma;
-    return;
-  }
+  if (dbg) dbg.textContent = `γ:${gamma.toFixed(1)}°`;
 
   // Anti-repetição: aguarda retorno à zona neutra
   if (travado) {
@@ -215,12 +198,13 @@ function handleMotion(event) {
     return;
   }
 
-  const deslocamento = calcularDelta(gamma, anguloReferencia);
+  // Zona neutra: não dispara nada
+  if (gamma > ZONA_NEUTRA) return;
 
-  if (deslocamento > LIMITE_ACAO) {
+  if (gamma > 0 && gamma < ZONA_VERDE) {
     processPoint('correct');
     travado = true;
-  } else if (deslocamento < -LIMITE_ACAO) {
+  } else if (gamma < ZONA_VERMELHA) {
     processPoint('passed');
     travado = true;
   }
