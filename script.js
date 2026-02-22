@@ -7,12 +7,7 @@ let timeLeft = 60;
 let gameTimer;
 let audioCtx = null;
 
-// --- Detecção de movimento ---
-const ZONA_NEUTRA = 70;   // gamma acima disso = celular na posição inicial
-const ZONA_VERDE  = 45;   // gamma abaixo disso (e > 0) = acertou
-const ZONA_VERMELHA = -25; // gamma abaixo disso = passou
-
-let travado = false;
+let stopTilt = null; // função retornada por tiltStart()
 
 // --- Áudio ---
 
@@ -172,7 +167,10 @@ function startGame() {
   if (screen.orientation && screen.orientation.lock) {
     screen.orientation.lock('landscape-primary').catch(() => {});
   }
-  window.addEventListener('deviceorientation', handleMotion);
+  stopTilt = tiltStart(
+    () => processPoint('correct'),
+    () => processPoint('passed'),
+  );
 }
 
 function nextWord() {
@@ -183,32 +181,6 @@ function nextWord() {
   document.getElementById('word-card').innerText = wordsQueue.pop();
 }
 
-// --- Movimento ---
-
-function handleMotion(event) {
-  const gamma = event.gamma;
-  if (gamma === null) return;
-
-  const dbg = document.getElementById('debug-overlay');
-  if (dbg) dbg.textContent = `γ:${gamma.toFixed(1)}°`;
-
-  // Anti-repetição: aguarda retorno à zona neutra
-  if (travado) {
-    if (gamma > ZONA_NEUTRA) travado = false;
-    return;
-  }
-
-  // Zona neutra: não dispara nada
-  if (gamma > ZONA_NEUTRA) return;
-
-  if (gamma > 0 && gamma < ZONA_VERDE) {
-    processPoint('correct');
-    travado = true;
-  } else if (gamma < ZONA_VERMELHA) {
-    processPoint('passed');
-    travado = true;
-  }
-}
 
 function processPoint(type) {
   const currentWord = document.getElementById('word-card').innerText;
@@ -238,7 +210,7 @@ function updateTimerDisplay() {
 
 function endGame() {
   clearInterval(gameTimer);
-  window.removeEventListener('deviceorientation', handleMotion);
+  if (stopTilt) { stopTilt(); stopTilt = null; }
   showScreen('result-screen');
 
   document.getElementById('final-score').innerText = score;
@@ -259,7 +231,7 @@ function endGame() {
 
 function exitGame() {
   clearInterval(gameTimer);
-  window.removeEventListener('deviceorientation', handleMotion);
+  if (stopTilt) { stopTilt(); stopTilt = null; }
   showScreen('menu-screen');
 }
 
