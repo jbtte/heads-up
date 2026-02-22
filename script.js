@@ -191,10 +191,10 @@ function handleMotion(event) {
   if (delta > 180) delta -= 360;
   if (delta < -180) delta += 360;
 
-  if (delta > 40) {
+  if (delta < -40) {
     isProcessing = true;
     processPoint('correct');
-  } else if (delta < -40) {
+  } else if (delta > 40) {
     isProcessing = true;
     processPoint('passed');
   }
