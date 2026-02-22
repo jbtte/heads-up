@@ -162,6 +162,9 @@ function startGame() {
     if (timeLeft <= 0) endGame();
   }, 1000);
 
+  if (screen.orientation && screen.orientation.lock) {
+    screen.orientation.lock('landscape-primary').catch(() => {});
+  }
   referenceBeta = null;
   window.addEventListener('deviceorientation', handleMotion);
 }
