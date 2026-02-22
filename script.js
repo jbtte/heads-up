@@ -7,6 +7,7 @@ let timeLeft = 60;
 let gameTimer;
 let isProcessing = false;
 let audioCtx = null;
+let tiltActive = false;
 
 // --- Áudio ---
 
@@ -173,27 +174,38 @@ function nextWord() {
     return;
   }
   document.getElementById('word-card').innerText = wordsQueue.pop();
+  tiltActive = false;
   isProcessing = false;
 }
 
 // --- Movimento ---
 
 function handleMotion(event) {
-  const beta = event.beta;
   const gamma = event.gamma;
-  if (beta === null) return;
+  if (gamma === null) return;
 
   const dbg = document.getElementById('debug-overlay');
-  if (dbg) dbg.textContent = `β:${beta.toFixed(1)}° γ:${gamma ? gamma.toFixed(1) : '?'}°`;
+  if (dbg) dbg.textContent = `γ:${gamma.toFixed(1)}°`;
 
   if (isProcessing) return;
 
-  if (beta > 2 && beta < 177.5) {
-    isProcessing = true;
-    processPoint('correct');
-  } else if (beta < 2) {
-    isProcessing = true;
-    processPoint('passed');
+  // Entra na zona de tilt
+  if (!tiltActive && gamma < 55 && gamma > -90) {
+    tiltActive = true;
+  }
+
+  if (tiltActive) {
+    if (gamma < -15) {
+      // Passou longe — passou a palavra
+      tiltActive = false;
+      isProcessing = true;
+      processPoint('passed');
+    } else if (gamma > 75) {
+      // Voltou para cima sem chegar em -15° — acertou
+      tiltActive = false;
+      isProcessing = true;
+      processPoint('correct');
+    }
   }
 }
 
