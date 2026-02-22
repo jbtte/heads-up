@@ -179,20 +179,18 @@ function nextWord() {
 // --- Movimento ---
 
 function handleMotion(event) {
-  const tilt = event.beta;
-  if (tilt === null) return;
+  const beta = event.beta;
+  const gamma = event.gamma;
+  if (beta === null) return;
 
   const dbg = document.getElementById('debug-overlay');
-  if (dbg) dbg.textContent = `β: ${tilt.toFixed(1)}°`;
+  if (dbg) dbg.textContent = `β:${beta.toFixed(1)}° γ:${gamma ? gamma.toFixed(1) : '?'}°`;
 
   if (isProcessing) return;
 
-  if (tilt < 20) {
+  if (beta > 160) {
     isProcessing = true;
     processPoint('correct');
-  } else if (tilt > 160) {
-    isProcessing = true;
-    processPoint('passed');
   }
 }
 
