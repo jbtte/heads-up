@@ -188,10 +188,10 @@ function handleMotion(event) {
 
   if (isProcessing) return;
 
-  if (beta < 130 && beta > 0) {
+  if (beta > 2 && beta < 177.5) {
     isProcessing = true;
     processPoint('correct');
-  } else if (beta < -130) {
+  } else if (beta < 2) {
     isProcessing = true;
     processPoint('passed');
   }
