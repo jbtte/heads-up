@@ -15,7 +15,6 @@ const MARGEM_RETORNO  = 15;
 let historicoLeituras = [];
 let travado           = false;
 let anguloReferencia  = null;
-let palavraMudou      = false;
 
 // --- Áudio ---
 
@@ -173,7 +172,6 @@ function startGame() {
   historicoLeituras = [];
   travado = false;
   anguloReferencia = null;
-  palavraMudou = true;
 
   if (screen.orientation && screen.orientation.lock) {
     screen.orientation.lock('landscape-primary').catch(() => {});
@@ -187,7 +185,6 @@ function nextWord() {
     return;
   }
   document.getElementById('word-card').innerText = wordsQueue.pop();
-  palavraMudou = true;
 }
 
 // --- Movimento ---
@@ -213,23 +210,19 @@ function handleMotion(event) {
 
   const dbg = document.getElementById('debug-overlay');
   if (dbg) {
-    const d = anguloReferencia !== null ? calcularDelta(anguloAtual, anguloReferencia).toFixed(1) : '?';
+    const d = anguloReferencia !== null ? calcularDelta(anguloAtual, anguloReferencia).toFixed(1) : 'cal...';
     dbg.textContent = `γ:${anguloAtual.toFixed(1)}° Δ:${d}°`;
   }
 
-  // Calibra referência quando palavra muda
-  if (palavraMudou) {
-    anguloReferencia = anguloAtual;
-    travado = false;
-    palavraMudou = false;
+  // Calibração inicial: aguarda posição neutra (gamma positivo e alto)
+  if (anguloReferencia === null) {
+    if (anguloAtual > 60) anguloReferencia = anguloAtual;
     return;
   }
 
-  if (anguloReferencia === null) return;
-
   const deslocamento = calcularDelta(anguloAtual, anguloReferencia);
 
-  // Anti-repetição: aguarda retorno ao centro
+  // Anti-repetição: aguarda retorno perto da referência
   if (travado) {
     if (Math.abs(deslocamento) < MARGEM_RETORNO) travado = false;
     return;
