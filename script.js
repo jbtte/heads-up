@@ -5,9 +5,17 @@ let passedCount = 0;
 let wordHistory = [];
 let timeLeft = 60;
 let gameTimer;
-let isProcessing = false;
 let audioCtx = null;
-let tiltActive = false;
+
+// --- Detecção de movimento ---
+const TAMANHO_FILTRO  = 5;
+const LIMITE_ACAO     = 40;
+const MARGEM_RETORNO  = 15;
+
+let historicoLeituras = [];
+let travado           = false;
+let anguloReferencia  = null;
+let palavraMudou      = false;
 
 // --- Áudio ---
 
@@ -162,6 +170,11 @@ function startGame() {
     if (timeLeft <= 0) endGame();
   }, 1000);
 
+  historicoLeituras = [];
+  travado = false;
+  anguloReferencia = null;
+  palavraMudou = true;
+
   if (screen.orientation && screen.orientation.lock) {
     screen.orientation.lock('landscape-primary').catch(() => {});
   }
@@ -174,38 +187,61 @@ function nextWord() {
     return;
   }
   document.getElementById('word-card').innerText = wordsQueue.pop();
-  tiltActive = false;
-  isProcessing = false;
+  palavraMudou = true;
 }
 
 // --- Movimento ---
+
+function obterAnguloSuave(valorBruto) {
+  historicoLeituras.push(valorBruto);
+  if (historicoLeituras.length > TAMANHO_FILTRO) historicoLeituras.shift();
+  return historicoLeituras.reduce((a, b) => a + b, 0) / historicoLeituras.length;
+}
+
+function calcularDelta(atual, referencia) {
+  let delta = referencia - atual;
+  if (delta >  90) delta -= 180;
+  if (delta < -90) delta += 180;
+  return delta;
+}
 
 function handleMotion(event) {
   const gamma = event.gamma;
   if (gamma === null) return;
 
+  const anguloAtual = obterAnguloSuave(gamma);
+
   const dbg = document.getElementById('debug-overlay');
-  if (dbg) dbg.textContent = `γ:${gamma.toFixed(1)}°`;
-
-  if (isProcessing) return;
-
-  // Entra na zona de tilt
-  if (!tiltActive && gamma < 55 && gamma > -90) {
-    tiltActive = true;
+  if (dbg) {
+    const d = anguloReferencia !== null ? calcularDelta(anguloAtual, anguloReferencia).toFixed(1) : '?';
+    dbg.textContent = `γ:${anguloAtual.toFixed(1)}° Δ:${d}°`;
   }
 
-  if (tiltActive) {
-    if (gamma < -15) {
-      // Passou longe — passou a palavra
-      tiltActive = false;
-      isProcessing = true;
-      processPoint('passed');
-    } else if (gamma > 75) {
-      // Voltou para cima sem chegar em -15° — acertou
-      tiltActive = false;
-      isProcessing = true;
-      processPoint('correct');
-    }
+  // Calibra referência quando palavra muda
+  if (palavraMudou) {
+    anguloReferencia = anguloAtual;
+    travado = false;
+    palavraMudou = false;
+    return;
+  }
+
+  if (anguloReferencia === null) return;
+
+  const deslocamento = calcularDelta(anguloAtual, anguloReferencia);
+
+  // Anti-repetição: aguarda retorno ao centro
+  if (travado) {
+    if (Math.abs(deslocamento) < MARGEM_RETORNO) travado = false;
+    return;
+  }
+
+  // Ação
+  if (deslocamento > LIMITE_ACAO) {
+    processPoint('correct');
+    travado = true;
+  } else if (deslocamento < -LIMITE_ACAO) {
+    processPoint('passed');
+    travado = true;
   }
 }
 
