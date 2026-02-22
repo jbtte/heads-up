@@ -187,7 +187,9 @@ function handleMotion(event) {
     return;
   }
 
-  const delta = tilt - referenceBeta;
+  let delta = tilt - referenceBeta;
+  if (delta > 180) delta -= 360;
+  if (delta < -180) delta += 360;
 
   if (delta > 40) {
     isProcessing = true;
