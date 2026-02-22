@@ -8,13 +8,11 @@ let gameTimer;
 let audioCtx = null;
 
 // --- Detecção de movimento ---
-const TAMANHO_FILTRO  = 5;
-const LIMITE_ACAO     = 40;
-const MARGEM_RETORNO  = 15;
+const LIMITE_ACAO    = 40;
+const ZONA_NEUTRA    = 70;  // gamma acima disso = celular na posição inicial
 
-let historicoLeituras = [];
-let travado           = false;
-let anguloReferencia  = null;
+let travado          = false;
+let anguloReferencia = null;
 
 // --- Áudio ---
 
@@ -169,7 +167,6 @@ function startGame() {
     if (timeLeft <= 0) endGame();
   }, 1000);
 
-  historicoLeituras = [];
   travado = false;
   anguloReferencia = null;
 
@@ -189,12 +186,6 @@ function nextWord() {
 
 // --- Movimento ---
 
-function obterAnguloSuave(valorBruto) {
-  historicoLeituras.push(valorBruto);
-  if (historicoLeituras.length > TAMANHO_FILTRO) historicoLeituras.shift();
-  return historicoLeituras.reduce((a, b) => a + b, 0) / historicoLeituras.length;
-}
-
 function calcularDelta(atual, referencia) {
   let delta = referencia - atual;
   if (delta >  90) delta -= 180;
@@ -206,29 +197,26 @@ function handleMotion(event) {
   const gamma = event.gamma;
   if (gamma === null) return;
 
-  const anguloAtual = obterAnguloSuave(gamma);
-
   const dbg = document.getElementById('debug-overlay');
   if (dbg) {
-    const d = anguloReferencia !== null ? calcularDelta(anguloAtual, anguloReferencia).toFixed(1) : 'cal...';
-    dbg.textContent = `γ:${anguloAtual.toFixed(1)}° Δ:${d}°`;
+    const d = anguloReferencia !== null ? calcularDelta(gamma, anguloReferencia).toFixed(1) : 'cal...';
+    dbg.textContent = `γ:${gamma.toFixed(1)}° Δ:${d}°`;
   }
 
-  // Calibração inicial: aguarda posição neutra (gamma positivo e alto)
+  // Calibração: aguarda posição neutra (gamma claramente positivo)
   if (anguloReferencia === null) {
-    if (anguloAtual > 60) anguloReferencia = anguloAtual;
+    if (gamma > ZONA_NEUTRA) anguloReferencia = gamma;
     return;
   }
 
-  const deslocamento = calcularDelta(anguloAtual, anguloReferencia);
-
-  // Anti-repetição: aguarda retorno perto da referência
+  // Anti-repetição: aguarda retorno à zona neutra
   if (travado) {
-    if (Math.abs(deslocamento) < MARGEM_RETORNO) travado = false;
+    if (gamma > ZONA_NEUTRA) travado = false;
     return;
   }
 
-  // Ação
+  const deslocamento = calcularDelta(gamma, anguloReferencia);
+
   if (deslocamento > LIMITE_ACAO) {
     processPoint('correct');
     travado = true;
