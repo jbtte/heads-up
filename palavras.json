@@ -1,0 +1,46 @@
+{
+  "categorias": [
+    {
+      "id": "santos",
+      "nome": "Santos",
+      "icone": "😇",
+      "palavras": [
+        "São Bento",
+        "Santa Teresinha",
+        "Santo Agostinho",
+        "São Padre Pio",
+        "Santa Dulce dos Pobres"
+      ]
+    },
+    {
+      "id": "biblia",
+      "nome": "Bíblia",
+      "icone": "📖",
+      "palavras": [
+        "Gênesis",
+        "Arca de Noé",
+        "Sermão da Montanha",
+        "Êxodo",
+        "Parábola do Semeador"
+      ]
+    },
+    {
+      "id": "corinthians",
+      "nome": "Corinthians",
+      "icone": "🦅",
+      "palavras": [
+        "Cássio",
+        "Arena Itaquera",
+        "Democracia Corinthiana",
+        "Rivelino",
+        "Sócrates"
+      ]
+    },
+    {
+      "id": "culinaria",
+      "nome": "Culinária",
+      "icone": "🍳",
+      "palavras": ["Risoto", "Bacalhoada", "Suflê", "Papo de Anjo", "Feijoada"]
+    }
+  ]
+}

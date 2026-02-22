@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="pt-br">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+    <title>Heads Up Católico & Diversos</title>
+
+    <!-- PWA -->
+    <link rel="manifest" href="manifest.json" />
+    <meta name="theme-color" content="#1a2a4a" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="Heads Up!" />
+    <link rel="apple-touch-icon" href="icon.svg" />
+
+    <!-- Fontes -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div id="rotate-warning">
+      <p>Gire o celular para a horizontal 🔄</p>
+    </div>
+
+    <main id="game-container">
+      <section id="start-screen" class="screen">
+        <div class="welcome-content">
+          <span class="welcome-icon">🎮</span>
+          <div class="welcome-text">
+            <h1>Heads Up!</h1>
+            <p>Prepare o seu telemóvel na testa e divirta-se!</p>
+            <button id="btn-start-app" class="btn-main">ENTRAR NO JOGO</button>
+          </div>
+        </div>
+      </section>
+      <section id="menu-screen" class="screen hidden">
+        <h1>Heads Up!</h1>
+        <div id="category-grid"></div>
+      </section>
+
+      <section id="countdown-screen" class="screen hidden">
+        <div id="countdown-number">3</div>
+      </section>
+
+      <section id="play-screen" class="screen hidden">
+        <button class="btn-back" onclick="exitGame()">✕</button>
+        <div id="timer">60</div>
+        <div id="word-card">PALAVRA</div>
+        <div class="instructions">
+          Incline para baixo (Acertou) | Para cima (Passar)
+        </div>
+      </section>
+
+      <section id="result-screen" class="screen hidden">
+        <h2>Fim de Jogo!</h2>
+        <div class="score-board">
+          <div class="score-item score-correct">
+            <span class="score-value" id="final-score">0</span>
+            <span class="score-label">Acertos</span>
+          </div>
+          <div class="score-item score-passed">
+            <span class="score-value" id="final-passed">0</span>
+            <span class="score-label">Passadas</span>
+          </div>
+        </div>
+        <div id="word-history"></div>
+        <button id="btn-play-again" class="btn-main">JOGAR NOVAMENTE</button>
+      </section>
+    </main>
+
+    <script src="script.js"></script>
+  </body>
+</html>

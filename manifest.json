@@ -1,0 +1,19 @@
+{
+  "name": "Heads Up! Católico & Diversos",
+  "short_name": "Heads Up!",
+  "description": "Jogo de adivinhação para grupos",
+  "start_url": "./",
+  "scope": "./",
+  "display": "fullscreen",
+  "orientation": "landscape",
+  "background_color": "#1a2a4a",
+  "theme_color": "#1a2a4a",
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}
