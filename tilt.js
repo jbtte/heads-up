@@ -4,10 +4,10 @@ export class TiltController {
     this.onPassed = onPassed;
 
     // Configurações de Sensibilidade
-    this.DISPARO_CORRETO = 35;   // Graus de delta para acerto (inclina para frente)
-    this.DISPARO_PASSADO = 50;   // Graus de delta para passou (inclina para trás, mais deliberado)
-    this.ZONA_NEUTRA = 70;       // Gamma acima disso = posição neutra (testa)
-    this.TEMPO_MINIMO = 200;     // Milissegundos segurando a inclinação
+    this.DISPARO_CORRETO = 35; // Graus de delta para acerto (inclina para frente)
+    this.DISPARO_PASSADO = 35; // Graus de delta para passou (inclina para trás, mais deliberado)
+    this.ZONA_NEUTRA = 70; // Gamma acima disso = posição neutra (testa)
+    this.TEMPO_MINIMO = 300; // Milissegundos segurando a inclinação
 
     this.travado = false;
     this.anguloReferencia = null;
