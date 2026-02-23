@@ -269,6 +269,11 @@ body, html {
     border-radius: 22px;
     max-width: 85%;
     text-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
+    transition: opacity 0.4s;
+}
+
+#word-card.settling {
+    opacity: 0.45;
 }
 
 .instructions {
